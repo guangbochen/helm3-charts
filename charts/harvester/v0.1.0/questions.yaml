@@ -448,7 +448,7 @@ questions:
         show_if: "minio.enabled=true"
       #################### Minio Storage Settings ####################
       - variable: minio.persistence.enabled
-        default: "false"
+        default: true
         label: "Use Storage"
         description: "Specify whether uses persistence volume"
         type: "boolean"
@@ -458,7 +458,7 @@ questions:
         default: ""
         label: "Storage Class"
         description: "Specify the storage class of persistence volume claim, use default if blank"
-        type: "string"
+        type: storageclass
         group: "Minio Settings"
         show_if: "minio.enabled=true && minio.persistence.enabled=true"
       - variable: minio.persistence.size
