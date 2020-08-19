@@ -1,0 +1,485 @@
+categories:
+  - virtualization
+  - kubevirt
+namespace: rancher-harvester
+questions:
+
+###
+#################### Harvester Advance Options ####################
+###
+  #################### Harvester Image Settings ####################
+  - variable: containers.apiserver.image.repository
+    default: "rancher/harvester"
+    label: "Harvester Image"
+    description: "Specify the repository of harvester image"
+    type: "string"
+    group: "Harvester Settings"
+  - variable: containers.apiserver.image.tag
+    default: "master-head"
+    label: "Harvester Image Tag"
+    description: "Specify the tag of harvester image"
+    type: "string"
+    group: "Harvester Settings"
+  #################### Harvester Resource Settings ####################
+  - variable: containers.apiserver.resources.requests.cpu
+    default: "250m"
+    label: "Harvester CPU Request"
+    description: "Specify the request of CPU resource"
+    type: "string"
+    group: "Harvester Settings"
+  - variable: containers.apiserver.resources.requests.memory
+    default: "256Mi"
+    label: "Harvester Memory Request"
+    description: "Specify the request of memory resource"
+    type: "string"
+    group: "Harvester Settings"
+  - variable: containers.apiserver.resources.limits.cpu
+    default: "500m"
+    label: "Harvester CPU Limit"
+    description: "Specify the limit of CPU resource"
+    type: "string"
+    group: "Harvester Settings"
+  - variable: containers.apiserver.resources.limits.memory
+    default: "512Mi"
+    label: "Harvester Memory Limit"
+    description: "Specify the limit of memory resource"
+    type: "string"
+    group: "Harvester Settings"
+  #################### Harvester Service Settings ####################
+  - variable: service.harvester.asClusterService
+    default: "true"
+    label: "Access From Rancher Proxy"
+    description: "Specify as cluster service, and then can be accessed from rancher proxy"
+    type: "boolean"
+    group: "Harvester Settings"
+  - variable: service.harvester.type
+    default: "ClusterIP"
+    label: "Harvester Service Type"
+    description: "Specify the type of service"
+    type: "enum"
+    options:
+      - ClusterIP
+      - NodePort
+      - LoadBalancer
+    group: "Harvester Settings"
+  - variable: service.harvester.httpsPort
+    default: "8443"
+    label: "Harvester Service HTTPs Port"
+    description: "Specify the port of HTTPs endpoint"
+    type: "int"
+    group: "Harvester Settings"
+  - variable: service.harvester.httpPort
+    default: "0"
+    label: "Harvester Service HTTP Port"
+    description: "Specify the port of HTTP endpoint, this port will be closed if set to 0"
+    type: "int"
+    group: "Harvester Settings"
+  #################### Harvester VM Image Storage Gateway Settings ####################
+  - variable: containers.apiserver.vmImageStorageGateway.endpoint
+    default: ""
+    label: "Endpoint of VM Image Storage"
+    description: "Specify the endpoint of vm image storage gateway"
+    type: "string"
+    group: "Harvester Settings"
+    show_if: "minio.enabled=false"
+    required: true
+  - variable: select_harvester_vm_image_storage_gateway_mode
+    default: "From-Secret"
+    label: "Get Account of VM Image Storage"
+    description: "Specify how to get the account of vm image storage gateway"
+    type: "enum"
+    options:
+      - "From-Secret"
+      - "From-Input"
+    group: "Harvester Settings"
+    show_if: "minio.enabled=false"
+  - variable: containers.apiserver.vmImageStorageGateway.secretName
+    default: ""
+    label: "Secret Name of Account"
+    description: "Specify the name of the same namespace existing Secret instance, which stored the access key(in 'accessKey' field) and secret key(in 'secretKey' field)"
+    type: "string"
+    group: "Harvester Settings"
+    show_if: "minio.enabled=false && select_harvester_vm_image_storage_gateway_mode=From-Secret"
+    required: true
+  - variable: containers.apiserver.vmImageStorageGateway.accessKey
+    default: ""
+    label: "Access Key of Account"
+    description: "Specify the access key, the value will be stored in 'accessKey' field of a specified Secret"
+    type: "string"
+    group: "Harvester Settings"
+    show_if: "minio.enabled=false && select_harvester_vm_image_storage_gateway_mode=From-Input"
+    required: true
+  - variable: containers.apiserver.vmImageStorageGateway.secretKey
+    default: ""
+    label: "Secret Key of Account"
+    description: "Specify the secret key, the value will be stored in 'secretKey' field of a specified Secret"
+    type: "string"
+    group: "Harvester Settings"
+    show_if: "minio.enabled=false && select_harvester_vm_image_storage_gateway_mode=From-Input"
+    required: true
+
+###
+#################### KubeVirt Advance Options ####################
+###
+  - variable: show_kubevirt_advance_options
+    default: "false"
+    label: "Show Advance Options"
+    type: "boolean"
+    show_subquestion_if: true
+    group: "KubeVirt Settings"
+    subquestions:
+      #################### KubeVirt Advance Control Settings ####################
+      - variable: tags.kubevirt
+        default: "true"
+        label: "Install KubeVirt operator and CRD resource"
+        type: "boolean"
+        group: "KubeVirt Settings"
+      #################### KubeVirt Operator Image Settings ####################
+      - variable: kubevirt-operator.containers.operator.image.repository
+        default: "kubevirt/virt-operator"
+        label: "Operator Image"
+        description: "Specify the repository of operator image"
+        type: "string"
+        group: "KubeVirt Settings"
+        show_if: "tags.kubevirt=true"
+      - variable: kubevirt-operator.containers.operator.image.tag
+        default: "latest"
+        label: "Operator Image Tag"
+        description: "Specify the tag of operator image"
+        type: "string"
+        group: "KubeVirt Settings"
+        show_if: "tags.kubevirt=true"
+      #################### KubeVirt Operator Resource Settings ####################
+      - variable: kubevirt-operator.containers.operator.resources.requests.cpu
+        default: "250m"
+        label: "Operator CPU Request"
+        description: "Specify the request of CPU resource"
+        type: "string"
+        group: "KubeVirt Settings"
+        show_if: "tags.kubevirt=true"
+      - variable: kubevirt-operator.containers.operator.resources.requests.memory
+        default: "256Mi"
+        label: "Operator Memory Request"
+        description: "Specify the request of memory resource"
+        type: "string"
+        group: "KubeVirt Settings"
+        show_if: "tags.kubevirt=true"
+      - variable: kubevirt-operator.containers.operator.resources.limits.cpu
+        default: "500m"
+        label: "Operator CPU Limit"
+        description: "Specify the limit of CPU resource"
+        type: "string"
+        group: "KubeVirt Settings"
+        show_if: "tags.kubevirt=true"
+      - variable: kubevirt-operator.containers.operator.resources.limits.memory
+        default: "512Mi"
+        label: "Operator Memory Limit"
+        description: "Specify the limit of memory resource"
+        type: "string"
+        group: "KubeVirt Settings"
+        show_if: "tags.kubevirt=true"
+      #################### KubeVirt CRD Settings ####################
+      - variable: kubevirt.spec.configuration.cpuModel
+        default: "host-model"
+        label: "Default Virtual Machine CPU Model"
+        description: "Specify the default CPU model of VirtualMachineInstance"
+        type: "string"
+        group: "KubeVirt Settings"
+        show_if: "tags.kubevirt=true"
+      - variable: kubevirt.spec.configuration.cpuRequest
+        default: "100m"
+        label: "Default Virtual Machine CPU Request"
+        description: "Specify the default CPU request of VirtualMachineInstance"
+        type: "string"
+        group: "KubeVirt Settings"
+        show_if: "tags.kubevirt=true"
+      - variable: kubevirt.spec.configuration.developerConfiguration.memoryOvercommit
+        default: "100"
+        label: "Virtual Machine Memory Overcommit Percent"
+        description: "Specify the memory overcommit in percent, default is means 100% to overcommit the memory"
+        type: "string"
+        group: "KubeVirt Settings"
+        show_if: "tags.kubevirt=true"
+      - variable: kubevirt.spec.configuration.developerConfiguration.useEmulation
+        default: "false"
+        label: "Use Emulated Virtual Machine"
+        description: "Specify if uses emulation"
+        type: "boolean"
+        group: "KubeVirt Settings"
+        show_if: "tags.kubevirt=true"
+      - variable: kubevirt.spec.uninstallStrategy
+        default: "RemoveWorkloads"
+        label: "Uninstall Strategy"
+        description: "Specify the uninstall strategy of KubeVirt"
+        type: "enum"
+        options:
+          - "RemoveWorkloads"
+          - "BlockUninstallIfWorkloadsExist"
+        group: "KubeVirt Settings"
+        show_if: "tags.kubevirt=true"
+
+###
+#################### CDI Advance Options ####################
+###
+  - variable: show_cdi_advance_options
+    default: "false"
+    label: "Show Advance Options"
+    type: "boolean"
+    show_subquestion_if: true
+    group: "CDI Settings"
+    subquestions:
+      #################### CDI Advance Control Settings ####################
+      - variable: tags.cdi
+        default: "true"
+        label: "Install CDI operator and CRD resource"
+        type: "boolean"
+        group: "CDI Settings"
+      #################### CDI Operator Image Settings ####################
+      - variable: cdi-operator.containers.operator.image.repository
+        default: "kubevirt/cdi-operator"
+        label: "Operator Image"
+        description: "Specify the repository of operator image"
+        type: "string"
+        group: "CDI Settings"
+        show_if: "tags.cdi=true"
+      - variable: cdi-operator.containers.operator.image.tag
+        default: "latest"
+        label: "Operator Image Tag"
+        description: "Specify the tag of operator image"
+        type: "string"
+        group: "CDI Settings"
+        show_if: "tags.cdi=true"
+      #################### CDI Operator Resource Settings ####################
+      - variable: cdi-operator.containers.operator.resources.requests.cpu
+        default: "250m"
+        label: "Operator CPU Request"
+        description: "Specify the request of CPU resource"
+        type: "string"
+        group: "CDI Settings"
+        show_if: "tags.cdi=true"
+      - variable: cdi-operator.containers.operator.resources.requests.memory
+        default: "256Mi"
+        label: "Operator Memory Request"
+        description: "Specify the request of memory resource"
+        type: "string"
+        group: "CDI Settings"
+        show_if: "tags.cdi=true"
+      - variable: cdi-operator.containers.operator.resources.limits.cpu
+        default: "500m"
+        label: "Operator CPU Limit"
+        description: "Specify the limit of CPU resource"
+        type: "string"
+        group: "CDI Settings"
+        show_if: "tags.cdi=true"
+      - variable: cdi-operator.containers.operator.resources.limits.memory
+        default: "512Mi"
+        label: "Operator Memory Limit"
+        description: "Specify the limit of memory resource"
+        type: "string"
+        group: "CDI Settings"
+        show_if: "tags.cdi=true"
+      #################### CDI CRD Settings ####################
+      - variable: cdi.spec.uninstallStrategy
+        default: "RemoveWorkloads"
+        label: "Uninstall Strategy"
+        description: "Specify the uninstall strategy of CDI"
+        type: "enum"
+        options:
+          - "RemoveWorkloads"
+          - "BlockUninstallIfWorkloadsExist"
+        group: "CDI Settings"
+        show_if: "tags.cdi=true"
+      - variable: show_cdi_components_advance_options
+        default: "false"
+        label: "Show CDI Components Advance Options"
+        type: "boolean"
+        show_if: "tags.cdi=true"
+        group: "CDI Settings"
+      #################### CDI Controller Image Settings ####################
+      - variable: cdi-operator.containers.controller.image.repository
+        default: "kubevirt/cdi-controller"
+        label: "Controller Image"
+        description: "Specify the repository of controller image"
+        type: "string"
+        group: "CDI Settings"
+        show_if: "tags.cdi=true && show_cdi_components_advance_options=true"
+      - variable: cdi-operator.containers.controller.image.tag
+        default: ""
+        label: "Controller Image Tag"
+        description: "Specify the tag of controller image, defaults to the tag of operator image"
+        type: "string"
+        group: "CDI Settings"
+        show_if: "tags.cdi=true && show_cdi_components_advance_options=true"
+      #################### CDI Importer Image Settings ####################
+      - variable: cdi-operator.containers.importer.image.repository
+        default: "kubevirt/cdi-importer"
+        label: "Importer Image"
+        description: "Specify the repository of importer image"
+        type: "string"
+        group: "CDI Settings"
+        show_if: "tags.cdi=true && show_cdi_components_advance_options=true"
+      - variable: cdi-operator.containers.importer.image.tag
+        default: ""
+        label: "Importer Image Tag"
+        description: "Specify the tag of importer image, defaults to the tag of operator image"
+        type: "string"
+        group: "CDI Settings"
+        show_if: "tags.cdi=true && show_cdi_components_advance_options=true"
+      #################### CDI Cloner Image Settings ####################
+      - variable: cdi-operator.containers.cloner.image.repository
+        default: "kubevirt/cdi-cloner"
+        label: "Cloner Image"
+        description: "Specify the repository of cloner image"
+        type: "string"
+        group: "CDI Settings"
+        show_if: "tags.cdi=true && show_cdi_components_advance_options=true"
+      - variable: cdi-operator.containers.cloner.image.tag
+        default: ""
+        label: "Cloner Image Tag"
+        description: "Specify the tag of cloner image, defaults to the tag of operator image"
+        type: "string"
+        group: "CDI Settings"
+        show_if: "tags.cdi=true && show_cdi_components_advance_options=true"
+      #################### CDI APIServer Image Settings ####################
+      - variable: cdi-operator.containers.apiserver.image.repository
+        default: "kubevirt/cdi-apiserver"
+        label: "APIServer Image"
+        description: "Specify the repository of apiserver image"
+        type: "string"
+        group: "CDI Settings"
+        show_if: "tags.cdi=true && show_cdi_components_advance_options=true"
+      - variable: cdi-operator.containers.apiserver.image.tag
+        default: ""
+        label: "APIServer Image Tag"
+        description: "Specify the tag of apiserver image, defaults to the tag of operator image"
+        type: "string"
+        group: "CDI Settings"
+        show_if: "tags.cdi=true && show_cdi_components_advance_options=true"
+      #################### CDI UploadServer Image Settings ####################
+      - variable: cdi-operator.containers.uploadserver.image.repository
+        default: "kubevirt/cdi-uploadserver"
+        label: "UploadServer Image"
+        description: "Specify the repository of uploadserver image"
+        type: "string"
+        group: "CDI Settings"
+        show_if: "tags.cdi=true && show_cdi_components_advance_options=true"
+      - variable: cdi-operator.containers.uploadserver.image.tag
+        default: ""
+        label: "UploadServer Image Tag"
+        description: "Specify the tag of uploadserver image, defaults to the tag of operator image"
+        type: "string"
+        group: "CDI Settings"
+        show_if: "tags.cdi=true && show_cdi_components_advance_options=true"
+      #################### CDI UploadProxy Image Settings ####################
+      - variable: cdi-operator.containers.uploadproxy.image.repository
+        default: "kubevirt/cdi-uploadproxy"
+        label: "UploadProxy Image"
+        description: "Specify the repository of uploadproxy image"
+        type: "string"
+        group: "CDI Settings"
+        show_if: "tags.cdi=true && show_cdi_components_advance_options=true"
+      - variable: cdi-operator.containers.uploadproxy.image.tag
+        default: ""
+        label: "UploadProxy Image Tag"
+        description: "Specify the tag of uploadproxy image, defaults to the tag of operator image"
+        type: "string"
+        group: "CDI Settings"
+        show_if: "tags.cdi=true && show_cdi_components_advance_options=true"
+
+###
+#################### Minio Advance Options ####################
+###
+  - variable: show_minio_advance_options
+    default: "false"
+    label: "Show Advance Options"
+    type: "boolean"
+    show_subquestion_if: true
+    group: "Minio Settings"
+    subquestions:
+      #################### Minio Advance Control Settings ####################
+      - variable: minio.enabled
+        default: "true"
+        label: "Install Minio"
+        type: "boolean"
+        group: "Minio Settings"
+      #################### Minio Image Settings ####################
+      - variable: minio.image.repository
+        default: "minio/minio"
+        label: "Minio Image"
+        description: "Specify the repository of minio image"
+        type: "string"
+        group: "Minio Settings"
+        show_if: "minio.enabled=true"
+      - variable: minio.image.tag
+        default: "RELEASE.2020-08-08T04-50-06Z"
+        label: "Minio Image Tag"
+        description: "Specify the tag of minio image"
+        type: "string"
+        group: "Minio Settings"
+        show_if: "minio.enabled=true"
+      #################### Minio Resource Settings ####################
+      - variable: minio.resources.requests.cpu
+        default: "250m"
+        label: "Minio CPU Request"
+        description: "Specify the request of CPU resource"
+        type: "string"
+        group: "Minio Settings"
+        show_if: "minio.enabled=true"
+      - variable: minio.resources.requests.memory
+        default: "256Mi"
+        label: "Minio Memory Request"
+        description: "Specify the request of memory resource"
+        type: "string"
+        group: "Minio Settings"
+        show_if: "minio.enabled=true"
+      - variable: minio.resources.limits.cpu
+        default: "500m"
+        label: "Minio CPU Limit"
+        description: "Specify the limit of CPU resource"
+        type: "string"
+        group: "Minio Settings"
+        show_if: "minio.enabled=true"
+      - variable: minio.resources.limits.memory
+        default: "512Mi"
+        label: "Minio Memory Limit"
+        description: "Specify the limit of memory resource"
+        type: "string"
+        group: "Minio Settings"
+        show_if: "minio.enabled=true"
+      #################### Minio Storage Settings ####################
+      - variable: minio.persistence.enabled
+        default: "false"
+        label: "Use Storage"
+        description: "Specify whether uses persistence volume"
+        type: "boolean"
+        group: "Minio Settings"
+        show_if: "minio.enabled=true"
+      - variable: minio.persistence.storageClass
+        default: ""
+        label: "Storage Class"
+        description: "Specify the storage class of persistence volume claim, use default if blank"
+        type: "string"
+        group: "Minio Settings"
+        show_if: "minio.enabled=true && minio.persistence.enabled=true"
+      - variable: minio.persistence.size
+        default: "500Gi"
+        label: "Size"
+        description: "Specify the size of persistence volume claim"
+        type: "string"
+        group: "Minio Settings"
+        show_if: "minio.enabled=true && minio.persistence.enabled=true"
+      #################### Minio Account Settings ####################
+      - variable: minio.accessKey
+        default: "YOURACCESSKEY"
+        label: "Minio Access Key"
+        description: "Specify the access key, the value will be stored in 'accessKey' field of a specified Secret"
+        type: "string"
+        group: "Minio Settings"
+        show_if: "minio.enabled=true"
+      - variable: minio.secretKey
+        default: "YOURSECRETKEY"
+        label: "Minio Secret Key"
+        description: "Specify the secret key, the value will be stored in 'secretKey' field of a specified Secret"
+        type: "string"
+        group: "Minio Settings"
+        show_if: "minio.enabled=true"
